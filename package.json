@@ -1,0 +1,19 @@
+{
+  "name": "gips",
+  "version": "0.0.01",
+  "private": true,
+  "author": "BumpyBill (https://bumpybill.me/)",
+  "license": "MIT",
+  "description": "A low-level Game Engine for TypeScriptA low-level Game Engine for TypeScript",
+  "devDependencies": {
+    "ts-loader": "^8.0.17",
+    "typescript": "^4.2.3",
+    "webpack": "^5.24.4",
+    "webpack-cli": "^4.5.0"
+  },
+  "scripts": {
+    "dev": "nodemon --config nodemon.json --exec \"npx webpack\"",
+    "dev:debug": "nodemon --config nodemon.json --inspect-brk src/index.ts"
+  },
+  "dependencies": {}
+}
