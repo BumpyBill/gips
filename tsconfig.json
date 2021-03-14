@@ -1,8 +1,8 @@
 {
   "compilerOptions": {
-    "outDir": "./dist/",
+    "outDir": "docs",
     "noImplicitAny": true,
-    "module": "ES2020",
+    "module": "ES6",
     "target": "es5",
     "jsx": "react",
     "allowJs": true,
