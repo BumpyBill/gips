@@ -6,5 +6,6 @@ A low-level Game Engine for TypeScript
 
 ## Technologies
 
-- #### [WebGL](https://get.webgl.org/)
-- #### [TypeScript](https://www.typescriptlang.org/)
+#### - [WebGL](https://get.webgl.org/)
+
+#### - [TypeScript](https://www.typescriptlang.org/)
