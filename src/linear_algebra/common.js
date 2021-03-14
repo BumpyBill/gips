@@ -15,9 +15,7 @@ export let ANGLE_ORDER = "zyx";
  *
  * @param {Float32ArrayConstructor | ArrayConstructor} type Array type, such as Float32Array or Array
  */
-export function setMatrixArrayType(
-  type: Float32ArrayConstructor | ArrayConstructor
-): void {
+export function setMatrixArrayType(type) {
   ARRAY_TYPE = type;
 }
 
@@ -29,7 +27,7 @@ const degree = Math.PI / 180;
  * @param {Number} a Angle in Degrees
  * @returns {Number} Angle in radians
  */
-export function toRadian(a: number): number {
+export function toRadian(a) {
   return a * degree;
 }
 
@@ -42,7 +40,7 @@ export function toRadian(a: number): number {
  * @param {Number} b The second number to test.
  * @returns {Boolean} True if the numbers are approximately equal, false otherwise.
  */
-export function equals(a: number, b: number): boolean {
+export function equals(a, b) {
   return Math.abs(a - b) <= EPSILON * Math.max(1.0, Math.abs(a), Math.abs(b));
 }
 

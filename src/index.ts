@@ -1,14 +1,13 @@
 import { Buffers } from "./interfaces/Buffers";
 import ProgramInfo from "./interfaces/ProgramInfo";
 import * as mat4 from "./linear_algebra/mat4";
+import Color from "./classes/Color";
 
 window.onload = main;
 
 function main(): void {
   const canvas: HTMLCanvasElement = document.querySelector("#glCanvas");
   const gl: WebGLRenderingContext = canvas.getContext("webgl");
-
-  // If we don't have a GL context, give up now
 
   if (!gl) {
     alert(
@@ -18,7 +17,6 @@ function main(): void {
   }
 
   // Vertex shader program
-
   const vsSource: string = `
     attribute vec4 aVertexPosition;
     uniform mat4 uModelViewMatrix;
@@ -29,15 +27,12 @@ function main(): void {
   `;
 
   // Fragment shader program
-
   const fsSource: string = `
     void main() {
       gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);
     }
   `;
 
-  // Initialize a shader program; this is where all the lighting
-  // for the vertices and so forth is established.
   const shaderProgram = initShaderProgram(gl, vsSource, fsSource);
 
   // Collect all the info needed to use the shader program.
@@ -65,12 +60,7 @@ function main(): void {
   drawScene(gl, programInfo, buffers);
 }
 
-//
-// initBuffers
-//
-// Initialize the buffers we'll need. For this demo, we just
-// have one object -- a simple two-dimensional square.
-//
+// Initialize the buffers we'll need.
 function initBuffers(gl: WebGLRenderingContext) {
   // Create a buffer for the square's positions.
 
@@ -96,52 +86,37 @@ function initBuffers(gl: WebGLRenderingContext) {
   };
 }
 
-//
 // Draw the scene.
-//
 function drawScene(
   gl: WebGLRenderingContext,
   programInfo: ProgramInfo,
   buffers: Buffers
 ): void {
-  gl.clearColor(0.0, 0.0, 0.0, 1.0); // Clear to black, fully opaque
+  const [r, g, b, a] = new Color(0, 0, 0, 1).raw;
+
+  gl.clearColor(r, g, b, a); // Clear to black, fully opaque
   gl.clearDepth(1.0); // Clear everything
   gl.enable(gl.DEPTH_TEST); // Enable depth testing
   gl.depthFunc(gl.LEQUAL); // Near things obscure far things
 
   // Clear the canvas before we start drawing on it.
-
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-  // Create a perspective matrix, a special matrix that is
-  // used to simulate the distortion of perspective in a camera.
-  // Our field of view is 45 degrees, with a width/height
-  // ratio that matches the display size of the canvas
-  // and we only want to see objects between 0.1 units
-  // and 100 units away from the camera.
-
+  // Create a perspective matrix
   const fieldOfView = (45 * Math.PI) / 180; // in radians
-  const aspect = 1920 / 1080;
+  const aspect = window.innerWidth / window.innerHeight;
   const zNear = 0.1;
   const zFar = 100.0;
   const projectionMatrix = mat4.create();
 
-  // note: glmatrix.js always has the first argument
-  // as the destination to receive the result.
   mat4.perspective(projectionMatrix, fieldOfView, aspect, zNear, zFar);
 
-  // Set the drawing position to the "identity" point, which is
-  // the center of the scene.
   const modelViewMatrix = mat4.create();
-
-  // Now move the drawing position a bit to where we want to
-  // start drawing the square.
-
   mat4.translate(
     modelViewMatrix, // destination matrix
     modelViewMatrix, // matrix to translate
     [-0.0, 0.0, -6.0]
-  ); // amount to translate
+  );
 
   // Tell WebGL how to pull out the positions from the position
   // buffer into the vertexPosition attribute.
@@ -164,11 +139,9 @@ function drawScene(
   }
 
   // Tell WebGL to use our program when drawing
-
   gl.useProgram(programInfo.program);
 
   // Set the shader uniforms
-
   gl.uniformMatrix4fv(
     programInfo.uniformLocations.projectionMatrix,
     false,
@@ -187,9 +160,7 @@ function drawScene(
   }
 }
 
-//
 // Initialize a shader program, so WebGL knows how to draw our data
-//
 function initShaderProgram(
   gl: WebGLRenderingContext,
   vsSource: string,
@@ -218,27 +189,22 @@ function initShaderProgram(
   return shaderProgram;
 }
 
-//
-// creates a shader of the given type, uploads the source and
+// Creates a shader of the given type, uploads the source and
 // compiles it.
-//
 function loadShader(
   gl: WebGLRenderingContext,
   type: any,
   source: string
-): WebGLShader {
+): WebGLShader | null {
   const shader = gl.createShader(type);
 
   // Send the source to the shader object
-
   gl.shaderSource(shader, source);
 
   // Compile the shader program
-
   gl.compileShader(shader);
 
   // See if it compiled successfully
-
   if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
     alert(
       "An error occurred compiling the shaders: " + gl.getShaderInfoLog(shader)
