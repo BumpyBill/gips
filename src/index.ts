@@ -1,7 +1,5 @@
-import { Game } from "./game";
-
-var game;
+import Game from "./Game";
 
 window.addEventListener("load", () => {
-  game = new Game();
+  new Game();
 });

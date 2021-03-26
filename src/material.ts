@@ -1,46 +1,45 @@
-export class Material {
+export default class Material {
   public program: WebGLProgram;
+
   public constructor(
-    private gl: WebGL2RenderingContext,
+    public gl: WebGL2RenderingContext,
     vs: string,
     fs: string
   ) {
-    var vsShader = this.getShader(vs, gl.VERTEX_SHADER);
-    var fsShader = this.getShader(fs, gl.FRAGMENT_SHADER);
+    let vsShader = this.getShader(vs, this.gl.VERTEX_SHADER);
+    let fsShader = this.getShader(fs, this.gl.FRAGMENT_SHADER);
 
     if (vsShader && fsShader) {
-      this.program = this.gl.createProgram();
-      this.gl.attachShader(this.program, vsShader);
-      this.gl.attachShader(this.program, fsShader);
+      this.program = gl.createProgram();
+      gl.attachShader(this.program, vsShader);
+      gl.attachShader(this.program, fsShader);
+      gl.linkProgram(this.program);
 
-      this.gl.linkProgram(this.program);
-
-      if (!this.gl.getProgramParameter(this.program, gl.LINK_STATUS)) {
+      if (!gl.getProgramParameter(this.program, gl.LINK_STATUS)) {
         console.error(
-          `Cannot load shader(s): \n${this.gl.getProgramInfoLog(this.program)}`
+          `Cannot load shader:\n${gl.getProgramInfoLog(this.program)}`
         );
-        alert("Error. Check console for more information.");
-        return;
+
+        return null;
       }
     }
 
-    this.gl.detachShader(this.program, vsShader);
-    this.gl.detachShader(this.program, fsShader);
-    this.gl.deleteShader(vsShader);
-    this.gl.deleteShader(fsShader);
-
-    this.gl.useProgram(null);
+    gl.detachShader(this.program, vsShader);
+    gl.detachShader(this.program, fsShader);
+    gl.deleteShader(vsShader);
+    gl.deleteShader(fsShader);
   }
 
-  private getShader(script: string, type: number): WebGLShader | null {
-    var out = this.gl.createShader(type);
-    this.gl.shaderSource(out, script);
-    this.gl.compileShader(out);
+  private getShader(script: string, type: number): null | WebGLShader {
+    let gl = this.gl;
 
-    if (!this.gl.getShaderParameter(out, this.gl.COMPILE_STATUS)) {
-      console.error(`Shader Error: \n${this.gl.getShaderInfoLog(out)}`);
-      alert("Error. Check console for more information.");
-      return;
+    var out = gl.createShader(type);
+    gl.shaderSource(out, script);
+    gl.compileShader(out);
+
+    if (!gl.getShaderParameter(out, gl.COMPILE_STATUS)) {
+      console.error(`Shader Error: \n${gl.getShaderInfoLog(out)}`);
+      return null;
     }
 
     return out;
@@ -48,57 +47,32 @@ export class Material {
 }
 
 export class Sprite {
-  public isLoaded: boolean = false;
-  public material: Material;
   public image: HTMLImageElement;
-  public sprite: any;
+  public isLoaded: boolean = false;
 
   private gl_tex: WebGLTexture;
-  private geo_buff: WebGLBuffer;
   private tex_buff: WebGLBuffer;
+  private geo_buff: WebGLBuffer;
   private aPositionLoc: number;
   private aTexcoordLoc: number;
   private uImageLoc: WebGLUniformLocation;
 
   public constructor(
-    private gl: WebGL2RenderingContext,
+    public gl: WebGL2RenderingContext,
     public img_url: string,
-    vs: string,
-    fs: string
+    public material: Material
   ) {
-    this.material = new Material(gl, vs, fs);
     this.image = new Image();
     this.image.src = img_url;
-    //@ts-ignore  (crappy fix)
-    this.image.sprite = this;
-    this.image.onload = () => {
-      this.setup();
-    };
+
+    this.image.onload = this.onLoad;
   }
 
-  private static createRectArray(
-    x: number = 1,
-    y: number = 1,
-    w: number = 1,
-    h: number = 1
-  ) {
-    return new Float32Array([
-      x,
-      y,
-      x + w,
-      y,
-      x,
-      y + h,
-      x,
-      y + h,
-      x + w,
-      y,
-      x + w,
-      y + h,
-    ]);
-  }
+  private onLoad = (): void => {
+    this.setup();
+  };
 
-  private setup(): void {
+  private setup = (): void => {
     let gl = this.gl;
 
     gl.useProgram(this.material.program);
@@ -139,9 +113,26 @@ export class Sprite {
 
     gl.useProgram(null);
     this.isLoaded = true;
+  };
+
+  static createRectArray(x = 0, y = 0, w = 1, h = 1) {
+    return new Float32Array([
+      x,
+      y,
+      x + w,
+      y,
+      x,
+      y + h,
+      x,
+      y + h,
+      x + w,
+      y,
+      x + w,
+      y + h,
+    ]);
   }
 
-  public render(): void {
+  public render() {
     if (this.isLoaded) {
       let gl = this.gl;
 

@@ -1,8 +1,8 @@
 {
   "compilerOptions": {
-    "outDir": "docs",
+    "outDir": "./docs/",
     "noImplicitAny": true,
-    "module": "ES6",
+    "module": "es6",
     "target": "es5",
     "jsx": "react",
     "allowJs": true,
