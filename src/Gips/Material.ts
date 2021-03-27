@@ -1,11 +1,19 @@
+import Vector2 from "../Math/Vector2";
+import Game from "./Game";
+import { Gips } from "./Gips";
+
 export default class Material {
   public program: WebGLProgram;
+  public gl: WebGL2RenderingContext;
 
   public constructor(
-    public gl: WebGL2RenderingContext,
-    vs: string,
-    fs: string
+    public game: Game,
+    vs: string = Gips.VertexShader,
+    fs: string = Gips.FragmentShader
   ) {
+    this.gl = game.gl;
+    let gl = this.gl;
+
     let vsShader = this.getShader(vs, this.gl.VERTEX_SHADER);
     let fsShader = this.getShader(fs, this.gl.FRAGMENT_SHADER);
 
@@ -49,6 +57,8 @@ export default class Material {
 export class Sprite {
   public image: HTMLImageElement;
   public isLoaded: boolean = false;
+  public size: Vector2 = new Vector2(64, 64);
+  public position: Vector2 = new Vector2();
 
   private gl_tex: WebGLTexture;
   private tex_buff: WebGLBuffer;
@@ -56,12 +66,17 @@ export class Sprite {
   private aPositionLoc: number;
   private aTexcoordLoc: number;
   private uImageLoc: WebGLUniformLocation;
+  private uWorldLoc: WebGLUniformLocation;
 
   public constructor(
     public gl: WebGL2RenderingContext,
     public img_url: string,
-    public material: Material
+    public material: Material,
+    public options?: SpriteOptions
   ) {
+    if ("size" in options) this.size = options.size;
+    if ("position" in options) this.position = options.position;
+
     this.image = new Image();
     this.image.src = img_url;
 
@@ -99,7 +114,16 @@ export class Sprite {
 
     this.geo_buff = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, this.geo_buff);
-    gl.bufferData(gl.ARRAY_BUFFER, Sprite.createRectArray(), gl.STATIC_DRAW);
+    gl.bufferData(
+      gl.ARRAY_BUFFER,
+      Sprite.createRectArray(
+        this.position.x,
+        this.position.y,
+        this.size.x,
+        this.size.y
+      ),
+      gl.STATIC_DRAW
+    );
 
     this.aPositionLoc = gl.getAttribLocation(
       this.material.program,
@@ -110,6 +134,7 @@ export class Sprite {
       "a_texCoord"
     );
     this.uImageLoc = gl.getUniformLocation(this.material.program, "u_image");
+    this.uWorldLoc = gl.getUniformLocation(this.material.program, "u_world");
 
     gl.useProgram(null);
     this.isLoaded = true;
@@ -150,9 +175,20 @@ export class Sprite {
       gl.enableVertexAttribArray(this.aPositionLoc);
       gl.vertexAttribPointer(this.aPositionLoc, 2, gl.FLOAT, false, 0, 0);
 
+      gl.uniformMatrix3fv(
+        this.uWorldLoc,
+        false,
+        this.material.game.worldSpaceMatrix.getFloatArray()
+      );
+
       gl.drawArrays(gl.TRIANGLE_STRIP, 0, 6);
 
       gl.useProgram(null);
     }
   }
+}
+
+export interface SpriteOptions {
+  size?: Vector2;
+  position?: Vector2;
 }
