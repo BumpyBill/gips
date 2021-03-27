@@ -6,6 +6,7 @@ export module Gips {
     uniform mat3 u_world;
     uniform mat3 u_object;
     uniform vec2 u_frame;
+    uniform vec2 u_scale;
 
     varying vec2 v_texCoord;
     void main(){

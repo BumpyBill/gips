@@ -154,12 +154,6 @@ export class Sprite {
   private gl_tex: WebGLTexture;
   private tex_buff: WebGLBuffer;
   private geo_buff: WebGLBuffer;
-  private aPositionLoc: number;
-  private aTexcoordLoc: number;
-  private uImageLoc: WebGLUniformLocation;
-  private uWorldLoc: WebGLUniformLocation;
-  private uFrameLoc: WebGLUniformLocation;
-  private uObjectLoc: WebGLUniformLocation;
 
   public constructor(
     public gl: WebGL2RenderingContext,
@@ -169,7 +163,7 @@ export class Sprite {
   ) {
     if ("size" in options) this.size = options.size;
     if ("position" in options) this.position = options.position;
-    if ("scale" in options) this.position = options.scale;
+    if ("scale" in options) this.scale = options.scale;
 
     this.image = new Image();
     this.image.src = img_url;
@@ -219,7 +213,12 @@ export class Sprite {
     gl.bindBuffer(gl.ARRAY_BUFFER, this.geo_buff);
     gl.bufferData(
       gl.ARRAY_BUFFER,
-      Sprite.createRectArray(0, 0, this.size.x, this.size.y),
+      Sprite.createRectArray(
+        0,
+        0,
+        this.size.x * this.scale.x,
+        this.size.y * this.scale.y
+      ),
       gl.STATIC_DRAW
     );
 
@@ -266,6 +265,7 @@ export class Sprite {
       gl.bindBuffer(gl.ARRAY_BUFFER, this.geo_buff);
       this.material.set("a_position");
 
+      // this.material.set("u_scale", this.scale.x, this.scale.y);
       this.material.set("u_frame", frame.x, frame.y);
       this.material.set(
         "u_world",
