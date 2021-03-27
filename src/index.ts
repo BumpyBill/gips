@@ -2,7 +2,6 @@ import Color from "./Gips/Color";
 import Game from "./Gips/Game";
 import Material, { Sprite } from "./Gips/Material";
 import Vector2 from "./Math/Vector2";
-import wrap from "./Math/wrap";
 
 window.addEventListener("load", () => {
   const game = new Game();

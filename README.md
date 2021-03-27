@@ -30,7 +30,7 @@ $ git clone git@github.com:BumpyBill/gips.git --branch 0.0.1
 
 ## Contributing
 
-Feedback and PRs are welcome! Take a look at the [contributing guidelines](CONTRIBUTING.md).
+Feedback and PRs are welcome!
 
 ## License
 
