@@ -3,7 +3,7 @@
 </p>
 
 <p align="center">
-A low-level Game Engine for TypeScript
+A mid-level Game Engine for TypeScript
 </p>
 
 <p align="center">
@@ -21,7 +21,7 @@ A low-level Game Engine for TypeScript
 ## Install
 
 ```sh
-$ git https://github.com/BumpyBill/gips --branch 0.0.1
+$ git clone https://github.com/BumpyBill/gips --branch 0.0.1
 ```
 
 ## Technologies
