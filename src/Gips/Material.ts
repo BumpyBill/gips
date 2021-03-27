@@ -59,6 +59,7 @@ export class Sprite {
   public isLoaded: boolean = false;
   public size: Vector2 = new Vector2(64, 64);
   public position: Vector2 = new Vector2();
+  public uv: Vector2 = new Vector2();
 
   private gl_tex: WebGLTexture;
   private tex_buff: WebGLBuffer;
@@ -67,6 +68,7 @@ export class Sprite {
   private aTexcoordLoc: number;
   private uImageLoc: WebGLUniformLocation;
   private uWorldLoc: WebGLUniformLocation;
+  private uFrameLoc: WebGLUniformLocation;
 
   public constructor(
     public gl: WebGL2RenderingContext,
@@ -108,9 +110,18 @@ export class Sprite {
     );
     gl.bindTexture(gl.TEXTURE_2D, null);
 
+    this.uv = new Vector2(
+      this.size.x / this.image.width,
+      this.size.y / this.image.height
+    );
+
     this.tex_buff = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, this.tex_buff);
-    gl.bufferData(gl.ARRAY_BUFFER, Sprite.createRectArray(), gl.STATIC_DRAW);
+    gl.bufferData(
+      gl.ARRAY_BUFFER,
+      Sprite.createRectArray(0, 0, this.uv.x, this.uv.y),
+      gl.STATIC_DRAW
+    );
 
     this.geo_buff = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, this.geo_buff);
@@ -135,29 +146,18 @@ export class Sprite {
     );
     this.uImageLoc = gl.getUniformLocation(this.material.program, "u_image");
     this.uWorldLoc = gl.getUniformLocation(this.material.program, "u_world");
+    this.uFrameLoc = gl.getUniformLocation(this.material.program, "u_frame");
 
     gl.useProgram(null);
     this.isLoaded = true;
   };
 
-  static createRectArray(x = 0, y = 0, w = 1, h = 1) {
-    return new Float32Array([
-      x,
-      y,
-      x + w,
-      y,
-      x,
-      y + h,
-      x,
-      y + h,
-      x + w,
-      y,
-      x + w,
-      y + h,
-    ]);
-  }
+  public render(frames: Vector2 = new Vector2(0, 0)) {
+    let frame = new Vector2(
+      Math.floor(frames.x) * this.uv.x,
+      Math.floor(frames.y) * this.uv.y
+    );
 
-  public render() {
     if (this.isLoaded) {
       let gl = this.gl;
 
@@ -175,6 +175,7 @@ export class Sprite {
       gl.enableVertexAttribArray(this.aPositionLoc);
       gl.vertexAttribPointer(this.aPositionLoc, 2, gl.FLOAT, false, 0, 0);
 
+      gl.uniform2f(this.uFrameLoc, frame.x, frame.y);
       gl.uniformMatrix3fv(
         this.uWorldLoc,
         false,
@@ -185,6 +186,23 @@ export class Sprite {
 
       gl.useProgram(null);
     }
+  }
+
+  static createRectArray(x = 0, y = 0, w = 1, h = 1) {
+    return new Float32Array([
+      x,
+      y,
+      x + w,
+      y,
+      x,
+      y + h,
+      x,
+      y + h,
+      x + w,
+      y,
+      x + w,
+      y + h,
+    ]);
   }
 }
 
