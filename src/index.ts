@@ -12,13 +12,15 @@ window.addEventListener("load", () => {
 
   const sprite = new Sprite(game.gl, "img/omw to steal df code.png", material, {
     size: new Vector2(360, 480),
+    position: new Vector2(0, game.canvasElm.height / 2 - 240),
   });
 
   game.updateFunction = function () {
     n += 0.1;
     n = wrap(n, 0, 3);
 
-    console.log(n);
+    sprite.position = sprite.position.add(new Vector2(0.25, 0));
+
     sprite.render(new Vector2(n));
   };
 

@@ -1,3 +1,4 @@
+import M3x3 from "../Math/Matrix3x3";
 import Vector2 from "../Math/Vector2";
 import Game from "./Game";
 import { Gips } from "./Gips";
@@ -69,6 +70,7 @@ export class Sprite {
   private uImageLoc: WebGLUniformLocation;
   private uWorldLoc: WebGLUniformLocation;
   private uFrameLoc: WebGLUniformLocation;
+  private uObjectLoc: WebGLUniformLocation;
 
   public constructor(
     public gl: WebGL2RenderingContext,
@@ -127,12 +129,7 @@ export class Sprite {
     gl.bindBuffer(gl.ARRAY_BUFFER, this.geo_buff);
     gl.bufferData(
       gl.ARRAY_BUFFER,
-      Sprite.createRectArray(
-        this.position.x,
-        this.position.y,
-        this.size.x,
-        this.size.y
-      ),
+      Sprite.createRectArray(0, 0, this.size.x, this.size.y),
       gl.STATIC_DRAW
     );
 
@@ -147,19 +144,22 @@ export class Sprite {
     this.uImageLoc = gl.getUniformLocation(this.material.program, "u_image");
     this.uWorldLoc = gl.getUniformLocation(this.material.program, "u_world");
     this.uFrameLoc = gl.getUniformLocation(this.material.program, "u_frame");
+    this.uObjectLoc = gl.getUniformLocation(this.material.program, "u_object");
 
     gl.useProgram(null);
     this.isLoaded = true;
   };
 
   public render(frames: Vector2 = new Vector2(0, 0)) {
-    let frame = new Vector2(
-      Math.floor(frames.x) * this.uv.x,
-      Math.floor(frames.y) * this.uv.y
-    );
-
     if (this.isLoaded) {
       let gl = this.gl;
+
+      let frame = new Vector2(
+        Math.floor(frames.x) * this.uv.x,
+        Math.floor(frames.y) * this.uv.y
+      );
+
+      let oMat = new M3x3().transition(this.position.x, this.position.y);
 
       gl.useProgram(this.material.program);
 
@@ -181,6 +181,7 @@ export class Sprite {
         false,
         this.material.game.worldSpaceMatrix.getFloatArray()
       );
+      gl.uniformMatrix3fv(this.uObjectLoc, false, oMat.getFloatArray());
 
       gl.drawArrays(gl.TRIANGLE_STRIP, 0, 6);
 

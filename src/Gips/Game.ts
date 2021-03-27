@@ -1,8 +1,9 @@
 import M3x3 from "../Math/Matrix3x3";
 
 export default class Game {
-  private canvasElm: HTMLCanvasElement;
   private _updateFunction: Function = function () {};
+
+  public canvasElm: HTMLCanvasElement;
   public worldSpaceMatrix: M3x3 = new M3x3();
 
   public set updateFunction(func: Function) {
