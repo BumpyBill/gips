@@ -149,6 +149,7 @@ export class Sprite {
   public size: Vector2 = new Vector2(64, 64);
   public position: Vector2 = new Vector2();
   public uv: Vector2 = new Vector2();
+  public scale: Vector2 = new Vector2(1, 1);
 
   private gl_tex: WebGLTexture;
   private tex_buff: WebGLBuffer;
@@ -168,6 +169,7 @@ export class Sprite {
   ) {
     if ("size" in options) this.size = options.size;
     if ("position" in options) this.position = options.position;
+    if ("scale" in options) this.position = options.scale;
 
     this.image = new Image();
     this.image.src = img_url;
@@ -298,4 +300,5 @@ export class Sprite {
 export interface SpriteOptions {
   size?: Vector2;
   position?: Vector2;
+  scale?: Vector2;
 }

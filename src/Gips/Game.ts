@@ -1,4 +1,5 @@
 import M3x3 from "../Math/Matrix3x3";
+import Color from "./Color";
 
 export default class Game {
   private _updateFunction: Function = function () {};
@@ -11,7 +12,7 @@ export default class Game {
   }
 
   public gl: WebGL2RenderingContext;
-  public clearColor: number[] = [0, 0, 0, 0];
+  public clearColor: Color = new Color();
 
   public constructor() {
     this.canvasElm = document.getElementById("glCanvas") as HTMLCanvasElement;
@@ -32,10 +33,10 @@ export default class Game {
     this.gl.viewport(0, 0, this.canvasElm.width, this.canvasElm.height);
 
     this.gl.clearColor(
-      this.clearColor[0],
-      this.clearColor[1],
-      this.clearColor[2],
-      this.clearColor[3]
+      this.clearColor.raw[0],
+      this.clearColor.raw[1],
+      this.clearColor.raw[2],
+      this.clearColor.raw[3]
     );
     this.gl.clear(this.gl.COLOR_BUFFER_BIT);
 
