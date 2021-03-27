@@ -8,7 +8,7 @@ window.addEventListener("load", () => {
 
   const material = new Material(game);
 
-  const sprite = new Sprite(game.gl, "img/femboy.png", material, {
+  const sprite = new Sprite(game.gl, "img/dev_art.png", material, {
     size: new Vector2(255, 255),
     position: new Vector2(window.innerWidth / 2, window.innerHeight / 2),
   });
@@ -18,10 +18,6 @@ window.addEventListener("load", () => {
   };
 
   window.addEventListener("resize", () => {
-    sprite.position = new Vector2(
-      window.innerWidth / 2,
-      window.innerHeight / 2
-    );
     game.resize(window.innerWidth, window.innerHeight);
   });
 });
