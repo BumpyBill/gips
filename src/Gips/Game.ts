@@ -1,11 +1,14 @@
 import M3x3 from "../Math/Matrix3x3";
 import Color from "./Color";
+import Sprite from "./Sprite";
 
 export default class Game {
   private _updateFunction: Function = function () {};
 
   public canvasElm: HTMLCanvasElement;
   public worldSpaceMatrix: M3x3 = new M3x3();
+  public sprites: Sprite[] = [];
+  public deltaTime: number = 0;
 
   public set updateFunction(func: Function) {
     this._updateFunction = func;
@@ -24,12 +27,12 @@ export default class Game {
   }
 
   private loop = () => {
-    this.update();
+    this.update(performance.now());
 
     requestAnimationFrame(this.loop);
   };
 
-  private update = () => {
+  private update = async (timeStamp: number) => {
     this.gl.viewport(0, 0, this.canvasElm.width, this.canvasElm.height);
 
     this.gl.clearColor(
@@ -43,7 +46,17 @@ export default class Game {
     this.gl.enable(this.gl.BLEND);
     this.gl.blendFunc(this.gl.SRC_ALPHA, this.gl.ONE_MINUS_SRC_ALPHA);
 
-    this._updateFunction();
+    for (var i = 0; i < this.sprites.length; i++) {
+      const sprite = await this.sprites[i];
+      sprite.render(this.sprites[i].frame);
+
+      for (var j = 0; j < sprite.components.length; j++) {
+        if ("update" in sprite.components[j])
+          await sprite.components[j].update(this.deltaTime);
+      }
+    }
+
+    this.deltaTime = timeStamp / performance.now();
 
     this.gl.flush();
   };

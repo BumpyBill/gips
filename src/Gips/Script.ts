@@ -1,3 +1,8 @@
+import Sprite from "./Sprite";
+
 export default interface Script {
-  update?(): void;
+  name: string;
+  sprite: Sprite;
+
+  update?(delta?: number): void;
 }
